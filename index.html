@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔮 命运之轮 · 塔罗占卜</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  :root {
+    --bg-deep: #080614;
+    --bg-card: #110d24;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --gold-dark: #8b6914;
+    --purple: #6b3fa0;
+    --purple-deep: #2a1040;
+    --text: #d4c5e8;
+    --text-dim: #8a7fa0;
+    --accent: #c4488a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── Starfield Canvas ── */
+  #starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── Mystical Fog Overlay ── */
+  .fog {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(8,6,20,0.85) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Main Container ── */
+  .main {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .header .moon-phase {
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 20px rgba(201,169,110,0.4));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 900;
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.08em;
+    margin-top: -0.3rem;
+    text-shadow: none;
+  }
+  .header .subtitle {
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    font-style: italic;
+    letter-spacing: 0.15em;
+    margin-top: 0.3rem;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    width: min(280px, 60vw);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1rem 0 1.5rem;
+    position: relative;
+  }
+  .divider::after {
+    content: '✦';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-deep);
+    padding: 0 0.8rem;
+    color: var(--gold);
+    font-size: 0.9rem;
+  }
+
+  /* ── Instruction ── */
+  .instruction {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 2rem;
+    transition: opacity 0.6s;
+  }
+
+  /* ── Card Spread ── */
+  .spread {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    flex-wrap: wrap;
+    justify-content: center;
+    perspective: 2000px;
+    margin-bottom: 2rem;
+  }
+
+  /* ── Card Slot ── */
+  .card-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .card-label {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.6s ease;
+  }
+  .card-slot.revealed .card-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── The Card ── */
+  .card {
+    width: clamp(100px, 22vw, 160px);
+    height: clamp(155px, 34vw, 248px);
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 10px;
+  }
+  .card.flipped {
+    transform: rotateY(180deg);
+    cursor: default;
+  }
+  .card.flipped:hover {
+    transform: rotateY(180deg) scale(1.02);
+  }
+  .card:hover:not(.flipped) {
+    transform: translateY(-8px) scale(1.03);
+    filter: brightness(1.15);
+  }
+  .card-front, .card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .card-front {
+    transform: rotateY(180deg);
+    background: linear-gradient(145deg, #1a0e30 0%, #110a22 40%, #0d0720 100%);
+    border: 1.5px solid var(--gold);
+    box-shadow: 0 0 25px rgba(107,63,160,0.3), inset 0 0 40px rgba(107,63,160,0.08);
+    padding: 1.2rem 0.8rem;
+    text-align: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+  .card-front .card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.2rem;
+    filter: drop-shadow(0 0 8px rgba(201,169,110,0.5));
+  }
+  .card-front .card-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.7rem, 1.8vw, 0.95rem);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+  }
+  .card-front .card-roman {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .card-front .card-meaning {
+    font-size: clamp(0.55rem, 1.3vw, 0.7rem);
+    color: var(--text);
+    line-height: 1.5;
+    margin-top: 0.3rem;
+    padding: 0 0.3rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.5s ease 0.4s;
+  }
+  .card.flipped .card-meaning {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .card-front .card-keywords {
+    font-size: 0.6rem;
+    color: var(--accent);
+    margin-top: auto;
+    padding: 0.3rem 0.5rem;
+    border-top: 1px solid rgba(201,169,110,0.2);
+    width: 100%;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.6s;
+  }
+  .card.flipped .card-keywords {
+    opacity: 1;
+  }
+
+  /* ── Card Back ── */
+  .card-back {
+    background: linear-gradient(135deg, #1c0f35 0%, #150a28 50%, #1a0d30 100%);
+    border: 2px solid var(--gold);
+    box-shadow: 0 4px 30px rgba(139,105,20,0.2);
+  }
+  .card-back-inner {
+    width: 82%;
+    height: 88%;
+    border: 1px solid rgba(201,169,110,0.4);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 8px,
+      rgba(201,169,110,0.04) 8px,
+      rgba(201,169,110,0.04) 9px
+    );
+  }
+  .card-back-eye {
+    font-size: 2.6rem;
+    filter: drop-shadow(0 0 12px rgba(196,72,138,0.5));
+    margin-bottom: 0.3rem;
+  }
+  .card-back-stars {
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    opacity: 0.6;
+  }
+  .card-back-border {
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(201,169,110,0.15);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+  .card-back-corner {
+    position: absolute;
+    font-size: 0.7rem;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+  .card-back-corner.tl { top: 6px; left: 8px; }
+  .card-back-corner.tr { top: 6px; right: 8px; }
+  .card-back-corner.bl { bottom: 6px; left: 8px; transform: rotate(180deg); }
+  .card-back-corner.br { bottom: 6px; right: 8px; transform: rotate(180deg); }
+
+  /* ── Reading Panel ── */
+  .reading {
+    max-width: 680px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease 0.3s;
+    pointer-events: none;
+  }
+  .reading.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .reading .reading-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.3rem;
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  .reading .reading-text {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text);
+    font-style: italic;
+    padding: 1.5rem 2rem;
+    background: rgba(17,13,36,0.7);
+    border: 1px solid rgba(201,169,110,0.2);
+    border-radius: 12px;
+    position: relative;
+  }
+  .reading .reading-text::before,
+  .reading .reading-text::after {
+    content: '"';
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.5rem;
+    color: var(--gold);
+    opacity: 0.3;
+    position: absolute;
+    line-height: 1;
+  }
+  .reading .reading-text::before { top: -0.3rem; left: 0.8rem; }
+  .reading .reading-text::after { bottom: -1.5rem; right: 0.8rem; }
+
+  /* ── Buttons ── */
+  .btn-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    padding: 0.8rem 2rem;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+    text-transform: uppercase;
+  }
+  .btn:hover {
+    background: rgba(201,169,110,0.1);
+    box-shadow: 0 0 20px rgba(201,169,110,0.2);
+  }
+  .btn.primary {
+    background: rgba(201,169,110,0.12);
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+  }
+  .btn.primary:hover {
+    background: rgba(201,169,110,0.25);
+    box-shadow: 0 0 30px rgba(201,169,110,0.3);
+  }
+
+  /* ── Card Flip Counter ── */
+  .flip-progress {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .flip-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(201,169,110,0.2);
+    border: 1px solid rgba(201,169,110,0.3);
+    transition: all 0.4s;
+  }
+  .flip-dot.done {
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .spread { gap: 0.8rem; }
+    .card { width: 95px; height: 148px; }
+    .card-front { padding: 0.6rem 0.4rem; gap: 0.15rem; }
+    .card-front .card-icon { font-size: 1.5rem; }
+    .card-front .card-name { font-size: 0.65rem; }
+    .card-front .card-meaning { font-size: 0.55rem; margin-top: 0.1rem; }
+    .card-back-eye { font-size: 1.8rem; }
+    .card-back-stars { font-size: 0.6rem; }
+    .reading .reading-text { padding: 1rem 1.2rem; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="fog"></div>
+
+<div class="main">
+  <!-- Header -->
+  <div class="header">
+    <div class="moon-phase">🔮</div>
+    <h1>命运之轮</h1>
+    <p class="subtitle">The Wheel of Fortune</p>
+  </div>
+  <div class="divider"></div>
+
+  <!-- Instructions -->
+  <p class="instruction" id="instruction">
+    静心凝神，在心中默念你的问题<br>
+    然后依次翻开三张牌
+  </p>
+
+  <!-- Progress Dots -->
+  <div class="flip-progress" id="progress">
+    <div class="flip-dot" data-idx="0"></div>
+    <div class="flip-dot" data-idx="1"></div>
+    <div class="flip-dot" data-idx="2"></div>
+  </div>
+
+  <!-- Card Spread -->
+  <div class="spread" id="spread"></div>
+
+  <!-- Reading -->
+  <div class="reading" id="reading">
+    <div class="reading-title">✦ 命运的低语 ✦</div>
+    <div class="reading-text" id="readingText"></div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="reshuffle()">🔮 重新占卜</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  TAROT DATA
+// ═══════════════════════════════════════
+const MAJOR_ARCANA = [
+  { id:0, name:'愚者', en:'The Fool', roman:'0', icon:'🌟', keywords:'开始·冒险·天真',
+    upright:'新的旅程即将开启。保持开放的心态，勇敢迈出第一步。命运的齿轮已为你转动，相信直觉，无畏前行。',
+    reversed:'冲动之举可能带来风险。暂停脚步，审视方向，莫让天真变成鲁莽。' },
+  { id:1, name:'魔术师', en:'The Magician', roman:'I', icon:'🪄', keywords:'创造力·意志·掌控',
+    upright:'你拥有实现目标所需的一切力量。集中意志，善用资源，此刻正是将愿景化为现实的时刻。',
+    reversed:'才能被浪费或滥用。警惕操纵与欺骗，确认你手中的工具是否真的为你所用。' },
+  { id:2, name:'女祭司', en:'The High Priestess', roman:'II', icon:'🌙', keywords:'直觉·潜意识·神秘',
+    upright:'答案不在外界，而在你内心深处。静下来，倾听直觉的低语。有些真相需要时间去浮现。',
+    reversed:'忽略了内心的声音。表面的喧嚣掩盖了真相，你需要独处，重新连接内在智慧。' },
+  { id:3, name:'皇后', en:'The Empress', roman:'III', icon:'👑', keywords:'丰饶·滋养·创造',
+    upright:'丰盛的季节到了。无论是事业、情感还是创意，大地母亲将赐予你丰厚的回报。拥抱生命的美好。',
+    reversed:'过度依赖或停滞。注意平衡给予与接受，不要让滋养变成窒息。' },
+  { id:4, name:'皇帝', en:'The Emperor', roman:'IV', icon:'🏰', keywords:'权威·秩序·掌控',
+    upright:'秩序与纪律将带来稳定。以坚定的意志建立你的王国，承担责任，成为自己的主宰。',
+    reversed:'专制或失控。权力被滥用，或是你过于抗拒规则。寻找灵活与纪律之间的平衡。' },
+  { id:5, name:'教皇', en:'The Hierophant', roman:'V', icon:'📜', keywords:'传统·指引·信仰',
+    upright:'寻求导师的指引，或遵循传统的智慧。有时候，答案就在被验证过的道路之上。',
+    reversed:'打破常规，质疑权威。你不需要别人的许可来走自己的路。' },
+  { id:6, name:'恋人', en:'The Lovers', roman:'VI', icon:'💕', keywords:'选择·关系·和谐',
+    upright:'重要的抉择即将到来。跟随真心，选择与你的价值观相契合的道路。真诚的关系将带来成长。',
+    reversed:'价值观冲突或错误的选择。审视内心的真正渴望，不要被表象迷惑。' },
+  { id:7, name:'战车', en:'The Chariot', roman:'VII', icon:'⚔️', keywords:'胜利·意志·征服',
+    upright:'克服万难，势如破竹。强大的意志力将带你冲破一切阻碍。保持专注，胜利在望。',
+    reversed:'失控或方向错误。急躁冒进只会翻车，你需要停下来重新掌控缰绳。' },
+  { id:8, name:'力量', en:'Strength', roman:'VIII', icon:'🦁', keywords:'勇气·耐心·内在力',
+    upright:'真正的力量来自内心。用温柔与耐心驯服内心的猛兽，你比想象中更强大。',
+    reversed:'自我怀疑或失控。内心的恐惧正在吞噬你的力量，你需要重新找回自信。' },
+  { id:9, name:'隐士', en:'The Hermit', roman:'IX', icon:'🏮', keywords:'内省·孤独·智慧',
+    upright:'退一步，寻找内心的灯塔。独处的时光将带来深刻的洞见，答案就在你的灵魂深处。',
+    reversed:'过度孤立或逃避。孤独变成了孤僻，你需要重新与世界建立连接。' },
+  { id:10, name:'命运之轮', en:'Wheel of Fortune', roman:'X', icon:'🎡', keywords:'转折·宿命·循环',
+    upright:'命运之轮正在转动！好运将至，抓住时机。人生有起有落，此刻正是上升的节点。',
+    reversed:'厄运或抗拒改变。与其对抗命运之流，不如顺势而为。转折终会到来。' },
+  { id:11, name:'正义', en:'Justice', roman:'XI', icon:'⚖️', keywords:'公正·真相·因果',
+    upright:'真相终将大白，公正必会降临。每一个选择都有其结果，相信因果法则的运作。',
+    reversed:'不公正或逃避责任。真相被掩盖，或是你拒绝面对自己的过错。' },
+  { id:12, name:'倒吊人', en:'The Hanged Man', roman:'XII', icon:'🙃', keywords:'牺牲·放手·新视角',
+    upright:'换个角度看世界。暂时的停滞不是终点，而是一种更高层次的洞察。放手即是获得。',
+    reversed:'无谓的牺牲或固执。你卡住了，却不愿改变视角。是时候挣脱自我设限的绳索了。' },
+  { id:13, name:'死神', en:'Death', roman:'XIII', icon:'💀', keywords:'终结·重生·蜕变',
+    upright:'不必恐惧——这不是肉体的死亡，而是旧我的终结。告别过去，迎接新生，蜕变已在发生。',
+    reversed:'抗拒改变或停滞不前。你死死抓住已经死去的东西，请放手，让生命自然流动。' },
+  { id:14, name:'节制', en:'Temperance', roman:'XIV', icon:'🌊', keywords:'平衡·调和·耐心',
+    upright:'中庸之道带来和谐。融合对立的力量，寻找恰到好处的平衡点。一切都在正确的时间发生。',
+    reversed:'失衡或过度。某一方面已经失控，你需要重新校准自己的生活节奏。' },
+  { id:15, name:'恶魔', en:'The Devil', roman:'XV', icon:'😈', keywords:'欲望·束缚·阴影',
+    upright:'审视你的欲望与执念。那些看似无法挣脱的枷锁，其实钥匙就在你手中。面对阴影，你才能自由。',
+    reversed:'挣脱束缚，觉醒的时刻。你终于看清了那些控制你的力量，解脱就在眼前。' },
+  { id:16, name:'高塔', en:'The Tower', roman:'XVI', icon:'🗼', keywords:'崩塌·觉醒·突变',
+    upright:'旧有的结构正在崩塌。看似灾难，实则是解放。当高塔倾倒，你才能看见真正的天空。',
+    reversed:'勉强维持或延迟崩溃。你在极力阻止不可避免的改变，但裂缝已经出现。' },
+  { id:17, name:'星星', en:'The Star', roman:'XVII', icon:'⭐', keywords:'希望·疗愈·灵感',
+    upright:'黑暗中闪耀的星光。疗愈已经开始，希望重燃。相信自己，宇宙正在为你指引方向。',
+    reversed:'希望破灭或自我怀疑。你暂时看不到光，但它从未消失。请继续相信。' },
+  { id:18, name:'月亮', en:'The Moon', roman:'XVIII', icon:'🌑', keywords:'幻象·恐惧·潜意识',
+    upright:'在月光下，一切都不似表面所见。直面内心的恐惧与幻象，穿过迷雾，方能抵达真相。',
+    reversed:'恐惧消退，迷雾散去。混乱即将结束，真相正从黑暗中浮现。' },
+  { id:19, name:'太阳', en:'The Sun', roman:'XIX', icon:'☀️', keywords:'喜悦·成功·活力',
+    upright:'阳光普照！这是充满喜悦、成功与活力的时刻。一切都清晰明朗，尽情享受这份温暖。',
+    reversed:'短暂的阴霾或过分乐观。快乐被遮蔽，但太阳终会出来。保持信心。' },
+  { id:20, name:'审判', en:'Judgement', roman:'XX', icon:'📯', keywords:'觉醒·召唤·重生',
+    upright:'觉醒的号角已经吹响。回应内心深处的召唤，拥抱全新的使命。这是灵魂重生的时刻。',
+    reversed:'逃避召唤或自我审判。你拒绝听到内心的声音，或是沉溺于过去的懊悔之中。' },
+  { id:21, name:'世界', en:'The World', roman:'XXI', icon:'🌍', keywords:'圆满·完成·整合',
+    upright:'一个完整周期的终结。旅途圆满，收获满满。庆祝你的成就，准备迎接新的冒险。',
+    reversed:'未完成或延迟的圆满。你还差最后一步，不要在此刻放弃。' }
+];
+
+// ═══════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════
+let drawnCards = [];
+let flipCount = 0;
+const TOTAL_CARDS = 3;
+
+// ═══════════════════════════════════════
+//  STARFIELD
+// ═══════════════════════════════════════
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+let shootingStars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function createStars() {
+  stars = [];
+  const count = Math.floor((canvas.width * canvas.height) / 1800);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      twinkle: Math.random() * Math.PI * 2,
+      speed: 0.01 + Math.random() * 0.03,
+      alpha: 0.3 + Math.random() * 0.7
+    });
+  }
+}
+createStars();
+window.addEventListener('resize', createStars);
+
+function spawnShootingStar() {
+  if (Math.random() < 0.003) {
+    shootingStars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.5,
+      len: 40 + Math.random() * 80,
+      speed: 8 + Math.random() * 12,
+      angle: Math.PI / 4 + Math.random() * 0.3,
+      life: 0,
+      maxLife: 40 + Math.random() * 30
+    });
+  }
+}
+
+function drawStarfield() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Stars
+  stars.forEach(s => {
+    s.twinkle += s.speed;
+    const alpha = s.alpha * (0.5 + 0.5 * Math.sin(s.twinkle));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,210,255,${alpha})`;
+    ctx.fill();
+    if (s.r > 1.1) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,150,255,${alpha * 0.1})`;
+      ctx.fill();
+    }
+  });
+
+  // Shooting Stars
+  spawnShootingStar();
+  shootingStars = shootingStars.filter(s => {
+    s.life++;
+    if (s.life > s.maxLife) return false;
+    const progress = s.life / s.maxLife;
+    const alpha = progress < 0.2 ? progress / 0.2 : 1 - (progress - 0.2) / 0.8;
+    const ex = s.x - Math.cos(s.angle) * s.len;
+    const ey = s.y + Math.sin(s.angle) * s.len;
+    
+    // tail gradient
+    const grad = ctx.createLinearGradient(s.x, s.y, ex, ey);
+    grad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+    grad.addColorStop(1, `rgba(255,255,255,0)`);
+    
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(ex, ey);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    s.x -= Math.cos(s.angle) * s.speed;
+    s.y += Math.sin(s.angle) * s.speed;
+    return true;
+  });
+
+  requestAnimationFrame(drawStarfield);
+}
+drawStarfield();
+
+// ═══════════════════════════════════════
+//  GAME LOGIC
+// ═══════════════════════════════════════
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function initSpread() {
+  drawnCards = shuffle(MAJOR_ARCANA).slice(0, TOTAL_CARDS);
+  flipCount = 0;
+  
+  const spread = document.getElementById('spread');
+  const progress = document.getElementById('progress');
+  const reading = document.getElementById('reading');
+  const instruction = document.getElementById('instruction');
+  
+  spread.innerHTML = '';
+  reading.classList.remove('active');
+  instruction.style.opacity = '1';
+  
+  // Reset progress dots
+  progress.querySelectorAll('.flip-dot').forEach(d => d.classList.remove('done'));
+  
+  const positions = ['过往', '当下', '未来'];
+  
+  drawnCards.forEach((card, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'card-slot';
+    
+    const label = document.createElement('div');
+    label.className = 'card-label';
+    label.textContent = positions[i];
+    slot.appendChild(label);
+    
+    const cardEl = document.createElement('div');
+    cardEl.className = 'card';
+    cardEl.setAttribute('data-index', i);
+    
+    // Front
+    const front = document.createElement('div');
+    front.className = 'card-front';
+    front.innerHTML = `
+      <div class="card-icon">${card.icon}</div>
+      <div class="card-name">${card.name}</div>
+      <div class="card-roman">${card.roman} · ${card.en}</div>
+      <div class="card-meaning">${card.upright}</div>
+      <div class="card-keywords">${card.keywords}</div>
+    `;
+    
+    // Back
+    const back = document.createElement('div');
+    back.className = 'card-back';
+    back.innerHTML = `
+      <div class="card-back-inner">
+        <div class="card-back-border"></div>
+        <div class="card-back-corner tl">✧</div>
+        <div class="card-back-corner tr">✧</div>
+        <div class="card-back-corner bl">✧</div>
+        <div class="card-back-corner br">✧</div>
+        <div class="card-back-eye">🧿</div>
+        <div class="card-back-stars">✧ ✦ ✧</div>
+      </div>
+    `;
+    
+    cardEl.appendChild(front);
+    cardEl.appendChild(back);
+    
+    cardEl.addEventListener('click', () => flipCard(i, cardEl, slot));
+    
+    slot.appendChild(cardEl);
+    spread.appendChild(slot);
+  });
+}
+
+function flipCard(index, cardEl, slot) {
+  if (cardEl.classList.contains('flipped')) return;
+  
+  cardEl.classList.add('flipped');
+  slot.classList.add('revealed');
+  flipCount++;
+  
+  // Update progress dot
+  document.querySelectorAll('.flip-dot')[index].classList.add('done');
+  
+  if (flipCount === TOTAL_CARDS) {
+    setTimeout(() => showReading(), 1000);
+  }
+}
+
+function showReading() {
+  const reading = document.getElementById('reading');
+  const instruction = document.getElementById('instruction');
+  const [past, present, future] = drawnCards;
+  
+  instruction.style.opacity = '0';
+  
+  const text = `你的${past.name}牌揭示了过往的印记：${past.upright.slice(0, 30)}。` +
+    `而今，${present.name}正指引着你当下的道路——${present.upright.slice(0, 35)}。` +
+    `展望未来，${future.name}牌预示：${future.upright.slice(0, 35)}` +
+    `命运的织线已为你铺就，${past.name}、${present.name}与${future.name}——这三张牌共同描绘了你此刻的灵魂图景。`;
+  
+  document.getElementById('readingText').textContent = text;
+  reading.classList.add('active');
+  
+  // Scroll to reading
+  reading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function reshuffle() {
+  document.getElementById('reading').classList.remove('active');
+  document.getElementById('instruction').style.opacity = '1';
+  initSpread();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+initSpread();
+</script>
+</body>
+</html>
