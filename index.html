@@ -62,33 +62,65 @@
   .card-slot.revealed .card-label { opacity: 1; transform: translateY(0); }
 
   /* ── The Card ── */
-  .card { width: clamp(100px, 22vw, 160px); height: clamp(155px, 34vw, 248px); position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
+  .card { width: clamp(120px, 24vw, 175px); height: clamp(190px, 40vw, 290px); position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
   .card.flipped { transform: rotateY(180deg); cursor: default; }
   .card.flipped:hover { transform: rotateY(180deg) scale(1.02); }
   .card:hover:not(.flipped) { transform: translateY(-8px) scale(1.03); filter: brightness(1.15); }
-  .card-front, .card-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-  .card-front { transform: rotateY(180deg); background: linear-gradient(145deg, #1a0e30 0%, #110a22 40%, #0d0720 100%); border: 1.5px solid var(--gold); box-shadow: 0 0 25px rgba(107,63,160,0.3), inset 0 0 40px rgba(107,63,160,0.08); padding: 1.1rem 0.8rem; text-align: center; justify-content: flex-start; gap: 0.3rem; transition: background 0.8s; }
+  .card-front, .card-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px; overflow: hidden; }
 
-  /* ── Reversed card front ── */
-  .card.reversed .card-front { background: linear-gradient(145deg, #2a1025 0%, #1a0a18 40%, #12061a 100%); border-color: var(--accent); box-shadow: 0 0 30px rgba(196,72,138,0.3), inset 0 0 40px rgba(196,72,138,0.1); }
-  .card.reversed .card-front .card-icon { transform: rotate(180deg); filter: drop-shadow(0 0 8px rgba(196,72,138,0.6)); }
-  .card.reversed .card-front .card-name { color: var(--accent); }
-  .card.reversed .card-front .card-roman { color: #996080; }
+  /* ── Card Front (Image) ── */
+  .card-front { transform: rotateY(180deg); border: 1.5px solid var(--gold); box-shadow: 0 0 25px rgba(107,63,160,0.3), inset 0 0 40px rgba(107,63,160,0.08); }
 
-  .card-front .card-icon { font-size: 2.2rem; margin-bottom: 0.1rem; filter: drop-shadow(0 0 8px rgba(201,169,110,0.5)); transition: all 0.5s; }
-  .card-front .card-name { font-family: 'Cinzel Decorative', serif; font-size: clamp(0.7rem, 1.8vw, 0.95rem); font-weight: 700; color: var(--gold-light); letter-spacing: 0.06em; line-height: 1.3; transition: color 0.5s; }
-  .card-front .card-roman { font-size: 0.58rem; color: var(--text-dim); font-style: italic; transition: color 0.5s; }
-  .card-front .card-meaning { font-size: clamp(0.55rem, 1.3vw, 0.7rem); color: var(--text); line-height: 1.5; margin-top: 0.2rem; padding: 0 0.3rem; opacity: 0; transform: translateY(8px); transition: all 0.5s ease 0.4s; }
+  .card-front .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .card-front .card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 0.5rem 0.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, transparent 100%);
+    text-align: center;
+    transition: opacity 0.5s;
+  }
+
+  .card-front .card-img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 0.6rem 0.6rem;
+    background: linear-gradient(to top, rgba(8,6,20,0.95) 0%, rgba(8,6,20,0.6) 50%, transparent 100%);
+    text-align: center;
+    transition: all 0.5s;
+  }
+
+  .card-front .card-name { font-family: 'Cinzel Decorative', serif; font-size: clamp(0.7rem, 1.8vw, 0.95rem); font-weight: 700; color: var(--gold-light); letter-spacing: 0.06em; line-height: 1.3; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+  .card-front .card-roman { font-size: 0.58rem; color: rgba(232,213,163,0.8); font-style: italic; letter-spacing: 0.08em; text-shadow: 0 0 8px rgba(0,0,0,0.8); }
+  .card-front .card-meaning { font-size: clamp(0.55rem, 1.3vw, 0.7rem); color: #e0d5f0; line-height: 1.5; margin-top: 0.15rem; padding: 0 0.2rem; opacity: 0; transform: translateY(8px); transition: all 0.5s ease 0.4s; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
   .card.flipped .card-meaning { opacity: 1; transform: translateY(0); }
-  .card-front .card-keywords { font-size: 0.58rem; margin-top: auto; padding: 0.25rem 0.5rem; border-top: 1px solid rgba(201,169,110,0.2); width: 100%; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.5s ease 0.6s; }
+  .card-front .card-keywords { font-size: 0.55rem; margin-top: 0.15rem; padding: 0.2rem 0.3rem 0; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.5s ease 0.6s; color: var(--gold); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
   .card.flipped .card-keywords { opacity: 1; }
-  .card.reversed .card-front .card-keywords { color: var(--accent); border-top-color: rgba(196,72,138,0.3); }
 
-  /* ── Reversed Badge ── */
-  .card-badge { position: absolute; top: 6px; right: 8px; font-family: 'Cinzel Decorative', serif; font-size: 0.55rem; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.1em; z-index: 5; opacity: 0; transform: scale(0.5); transition: all 0.4s ease 0.3s; pointer-events: none; }
+  /* ── Reversed card styling ── */
+  .card.reversed .card-front .card-img { transform: rotate(180deg); }
+  .card.reversed .card-front { border-color: var(--accent); box-shadow: 0 0 30px rgba(196,72,138,0.3), inset 0 0 40px rgba(196,72,138,0.1); }
+  .card.reversed .card-front .card-name { color: var(--accent); }
+  .card.reversed .card-front .card-roman { color: #d4a0b8; }
+  .card.reversed .card-front .card-keywords { color: var(--accent); }
+  .card.reversed .card-front .card-img-overlay { background: linear-gradient(to top, rgba(42,16,37,0.95) 0%, rgba(42,16,37,0.6) 50%, transparent 100%); }
+
+  /* ── Badge ── */
+  .card-badge { position: absolute; top: 6px; right: 8px; font-family: 'Cinzel Decorative', serif; font-size: 0.55rem; padding: 3px 7px; border-radius: 3px; letter-spacing: 0.1em; z-index: 5; opacity: 0; transform: scale(0.5); transition: all 0.4s ease 0.3s; pointer-events: none; backdrop-filter: blur(4px); }
   .card.flipped .card-badge { opacity: 1; transform: scale(1); }
-  .card-badge.upright { background: rgba(201,169,110,0.2); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
-  .card-badge.reversed-badge { background: rgba(196,72,138,0.2); color: var(--accent); border: 1px solid rgba(196,72,138,0.3); }
+  .card-badge.upright { background: rgba(201,169,110,0.25); color: var(--gold-light); border: 1px solid rgba(201,169,110,0.4); }
+  .card-badge.reversed-badge { background: rgba(196,72,138,0.25); color: var(--accent); border: 1px solid rgba(196,72,138,0.4); }
 
   /* ── Card Back ── */
   .card-back { background: linear-gradient(135deg, #1c0f35 0%, #150a28 50%, #1a0d30 100%); border: 2px solid var(--gold); box-shadow: 0 4px 30px rgba(139,105,20,0.2); }
@@ -109,15 +141,16 @@
   .reading .reading-text::before { top: -0.3rem; left: 0.8rem; }
   .reading .reading-text::after { bottom: -1.5rem; right: 0.8rem; }
 
-  /* ── Single Card Reading ── */
+  /* ── Single/Three Card Summary ── */
   .reading .reading-card-summary { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .reading .mini-card { display: inline-flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.8rem 1.2rem; background: rgba(17,13,36,0.8); border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; }
+  .reading .mini-card { display: inline-flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.5rem; background: rgba(17,13,36,0.8); border: 1px solid rgba(201,169,110,0.25); border-radius: 10px; overflow: hidden; width: 90px; }
   .reading .mini-card.reversed-mini { border-color: rgba(196,72,138,0.3); background: rgba(42,16,37,0.8); }
-  .reading .mini-card .mini-icon { font-size: 1.8rem; }
-  .reading .mini-card .mini-name { font-family: 'Cinzel Decorative', serif; font-size: 0.85rem; color: var(--gold-light); }
+  .reading .mini-card .mini-img { width: 100%; height: auto; border-radius: 4px; display: block; }
+  .reading .mini-card .mini-img.reversed-img { transform: rotate(180deg); }
+  .reading .mini-card .mini-name { font-family: 'Cinzel Decorative', serif; font-size: 0.7rem; color: var(--gold-light); margin-top: 0.2rem; }
   .reading .mini-card.reversed-mini .mini-name { color: var(--accent); }
-  .reading .mini-card .mini-pos { font-size: 0.65rem; color: var(--text-dim); }
-  .reading .mini-card .mini-badge { font-size: 0.55rem; letter-spacing: 0.1em; margin-top: 0.1rem; padding: 1px 6px; border-radius: 3px; }
+  .reading .mini-card .mini-pos { font-size: 0.6rem; color: var(--text-dim); }
+  .reading .mini-card .mini-badge { font-size: 0.5rem; letter-spacing: 0.1em; margin-top: 0.1rem; padding: 1px 6px; border-radius: 3px; }
   .reading .mini-card .mini-badge.upright-badge { color: var(--gold); border: 1px solid rgba(201,169,110,0.3); }
   .reading .mini-card .mini-badge.reversed-badge { color: var(--accent); border: 1px solid rgba(196,72,138,0.3); }
 
@@ -132,14 +165,15 @@
   .flip-dot.done { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
 
   @media (max-width: 640px) {
-    .spread { gap: 0.8rem; } .card { width: 95px; height: 148px; }
-    .card-front { padding: 0.5rem 0.3rem; gap: 0.1rem; }
-    .card-front .card-icon { font-size: 1.5rem; } .card-front .card-name { font-size: 0.6rem; }
-    .card-front .card-meaning { font-size: 0.5rem; margin-top: 0.05rem; }
+    .spread { gap: 0.8rem; } .card { width: 105px; height: 168px; }
+    .card-front .card-overlay { padding: 1.5rem 0.3rem 0.3rem; }
+    .card-front .card-name { font-size: 0.58rem; }
+    .card-front .card-meaning { font-size: 0.48rem; }
     .card-back-eye { font-size: 1.8rem; } .card-back-stars { font-size: 0.6rem; }
     .reading .reading-text { padding: 1rem 1.2rem; font-size: 0.9rem; }
     .mode-btn { padding: 0.5rem 1rem; font-size: 0.65rem; }
     .card-badge { font-size: 0.48rem; top: 4px; right: 4px; }
+    .reading .mini-card { width: 65px; }
   }
 </style>
 </head>
@@ -184,70 +218,70 @@
 <script>
 // ═══════════════════════════════════════
 const MAJOR_ARCANA = [
-  { id:0, name:'愚者', en:'The Fool', roman:'0', icon:'🌟', keywords:'开始·冒险·天真', keywordsR:'鲁莽·轻率·风险',
+  { id:0, name:'愚者', en:'The Fool', roman:'0', keywords:'开始·冒险·天真', keywordsR:'鲁莽·轻率·风险',
     upright:'新的旅程即将开启。保持开放的心态，勇敢迈出第一步。命运的齿轮已为你转动，相信直觉，无畏前行。',
     reversed:'冲动之举可能带来风险。暂停脚步，审视方向，莫让天真变成鲁莽。' },
-  { id:1, name:'魔术师', en:'The Magician', roman:'I', icon:'🪄', keywords:'创造力·意志·掌控', keywordsR:'欺骗·滥用·失控',
+  { id:1, name:'魔术师', en:'The Magician', roman:'I', keywords:'创造力·意志·掌控', keywordsR:'欺骗·滥用·失控',
     upright:'你拥有实现目标所需的一切力量。集中意志，善用资源，此刻正是将愿景化为现实的时刻。',
     reversed:'才能被浪费或滥用。警惕操纵与欺骗，确认你手中的工具是否真的为你所用。' },
-  { id:2, name:'女祭司', en:'The High Priestess', roman:'II', icon:'🌙', keywords:'直觉·潜意识·神秘', keywordsR:'沉默·封闭·忽视',
+  { id:2, name:'女祭司', en:'The High Priestess', roman:'II', keywords:'直觉·潜意识·神秘', keywordsR:'沉默·封闭·忽视',
     upright:'答案不在外界，而在你内心深处。静下来，倾听直觉的低语。有些真相需要时间去浮现。',
     reversed:'忽略了内心的声音。表面的喧嚣掩盖了真相，你需要独处，重新连接内在智慧。' },
-  { id:3, name:'皇后', en:'The Empress', roman:'III', icon:'👑', keywords:'丰饶·滋养·创造', keywordsR:'依赖·窒息·停滞',
+  { id:3, name:'皇后', en:'The Empress', roman:'III', keywords:'丰饶·滋养·创造', keywordsR:'依赖·窒息·停滞',
     upright:'丰盛的季节到了。无论是事业、情感还是创意，大地母亲将赐予你丰厚的回报。拥抱生命的美好。',
     reversed:'过度依赖或停滞。注意平衡给予与接受，不要让滋养变成窒息。' },
-  { id:4, name:'皇帝', en:'The Emperor', roman:'IV', icon:'🏰', keywords:'权威·秩序·掌控', keywordsR:'专制·混乱·失控',
+  { id:4, name:'皇帝', en:'The Emperor', roman:'IV', keywords:'权威·秩序·掌控', keywordsR:'专制·混乱·失控',
     upright:'秩序与纪律将带来稳定。以坚定的意志建立你的王国，承担责任，成为自己的主宰。',
     reversed:'专制或失控。权力被滥用，或是你过于抗拒规则。寻找灵活与纪律之间的平衡。' },
-  { id:5, name:'教皇', en:'The Hierophant', roman:'V', icon:'📜', keywords:'传统·指引·信仰', keywordsR:'反叛·质疑·突破',
+  { id:5, name:'教皇', en:'The Hierophant', roman:'V', keywords:'传统·指引·信仰', keywordsR:'反叛·质疑·突破',
     upright:'寻求导师的指引，或遵循传统的智慧。有时候，答案就在被验证过的道路之上。',
     reversed:'打破常规，质疑权威。你不需要别人的许可来走自己的路。' },
-  { id:6, name:'恋人', en:'The Lovers', roman:'VI', icon:'💕', keywords:'选择·关系·和谐', keywordsR:'冲突·错误·分裂',
+  { id:6, name:'恋人', en:'The Lovers', roman:'VI', keywords:'选择·关系·和谐', keywordsR:'冲突·错误·分裂',
     upright:'重要的抉择即将到来。跟随真心，选择与你的价值观相契合的道路。真诚的关系将带来成长。',
     reversed:'价值观冲突或错误的选择。审视内心的真正渴望，不要被表象迷惑。' },
-  { id:7, name:'战车', en:'The Chariot', roman:'VII', icon:'⚔️', keywords:'胜利·意志·征服', keywordsR:'失控·冒进·翻车',
+  { id:7, name:'战车', en:'The Chariot', roman:'VII', keywords:'胜利·意志·征服', keywordsR:'失控·冒进·翻车',
     upright:'克服万难，势如破竹。强大的意志力将带你冲破一切阻碍。保持专注，胜利在望。',
     reversed:'失控或方向错误。急躁冒进只会翻车，你需要停下来重新掌控缰绳。' },
-  { id:8, name:'力量', en:'Strength', roman:'VIII', icon:'🦁', keywords:'勇气·耐心·内在力', keywordsR:'恐惧·软弱·失控',
+  { id:8, name:'力量', en:'Strength', roman:'VIII', keywords:'勇气·耐心·内在力', keywordsR:'恐惧·软弱·失控',
     upright:'真正的力量来自内心。用温柔与耐心驯服内心的猛兽，你比想象中更强大。',
     reversed:'自我怀疑或失控。内心的恐惧正在吞噬你的力量，你需要重新找回自信。' },
-  { id:9, name:'隐士', en:'The Hermit', roman:'IX', icon:'🏮', keywords:'内省·孤独·智慧', keywordsR:'孤僻·逃避·迷失',
+  { id:9, name:'隐士', en:'The Hermit', roman:'IX', keywords:'内省·孤独·智慧', keywordsR:'孤僻·逃避·迷失',
     upright:'退一步，寻找内心的灯塔。独处的时光将带来深刻的洞见，答案就在你的灵魂深处。',
     reversed:'过度孤立或逃避。孤独变成了孤僻，你需要重新与世界建立连接。' },
-  { id:10, name:'命运之轮', en:'Wheel of Fortune', roman:'X', icon:'🎡', keywords:'转折·宿命·循环', keywordsR:'厄运·抗拒·停滞',
+  { id:10, name:'命运之轮', en:'Wheel of Fortune', roman:'X', keywords:'转折·宿命·循环', keywordsR:'厄运·抗拒·停滞',
     upright:'命运之轮正在转动！好运将至，抓住时机。人生有起有落，此刻正是上升的节点。',
     reversed:'厄运或抗拒改变。与其对抗命运之流，不如顺势而为。转折终会到来。' },
-  { id:11, name:'正义', en:'Justice', roman:'XI', icon:'⚖️', keywords:'公正·真相·因果', keywordsR:'不公·逃避·偏见',
+  { id:11, name:'正义', en:'Justice', roman:'XI', keywords:'公正·真相·因果', keywordsR:'不公·逃避·偏见',
     upright:'真相终将大白，公正必会降临。每一个选择都有其结果，相信因果法则的运作。',
     reversed:'不公正或逃避责任。真相被掩盖，或是你拒绝面对自己的过错。' },
-  { id:12, name:'倒吊人', en:'The Hanged Man', roman:'XII', icon:'🙃', keywords:'牺牲·放手·新视角', keywordsR:'固执·无谓·卡住',
+  { id:12, name:'倒吊人', en:'The Hanged Man', roman:'XII', keywords:'牺牲·放手·新视角', keywordsR:'固执·无谓·卡住',
     upright:'换个角度看世界。暂时的停滞不是终点，而是一种更高层次的洞察。放手即是获得。',
     reversed:'无谓的牺牲或固执。你卡住了，却不愿改变视角。是时候挣脱自我设限的绳索了。' },
-  { id:13, name:'死神', en:'Death', roman:'XIII', icon:'💀', keywords:'终结·重生·蜕变', keywordsR:'抗拒·停滞·恐惧',
+  { id:13, name:'死神', en:'Death', roman:'XIII', keywords:'终结·重生·蜕变', keywordsR:'抗拒·停滞·恐惧',
     upright:'不必恐惧——这不是肉体的死亡，而是旧我的终结。告别过去，迎接新生，蜕变已在发生。',
     reversed:'抗拒改变或停滞不前。你死死抓住已经死去的东西，请放手，让生命自然流动。' },
-  { id:14, name:'节制', en:'Temperance', roman:'XIV', icon:'🌊', keywords:'平衡·调和·耐心', keywordsR:'失衡·过度·极端',
+  { id:14, name:'节制', en:'Temperance', roman:'XIV', keywords:'平衡·调和·耐心', keywordsR:'失衡·过度·极端',
     upright:'中庸之道带来和谐。融合对立的力量，寻找恰到好处的平衡点。一切都在正确的时间发生。',
     reversed:'失衡或过度。某一方面已经失控，你需要重新校准自己的生活节奏。' },
-  { id:15, name:'恶魔', en:'The Devil', roman:'XV', icon:'😈', keywords:'欲望·束缚·阴影', keywordsR:'觉醒·挣脱·自由',
+  { id:15, name:'恶魔', en:'The Devil', roman:'XV', keywords:'欲望·束缚·阴影', keywordsR:'觉醒·挣脱·自由',
     upright:'审视你的欲望与执念。那些看似无法挣脱的枷锁，其实钥匙就在你手中。面对阴影，你才能自由。',
     reversed:'挣脱束缚，觉醒的时刻。你终于看清了那些控制你的力量，解脱就在眼前。' },
-  { id:16, name:'高塔', en:'The Tower', roman:'XVI', icon:'🗼', keywords:'崩塌·觉醒·突变', keywordsR:'勉强·延迟·恐惧',
+  { id:16, name:'高塔', en:'The Tower', roman:'XVI', keywords:'崩塌·觉醒·突变', keywordsR:'勉强·延迟·恐惧',
     upright:'旧有的结构正在崩塌。看似灾难，实则是解放。当高塔倾倒，你才能看见真正的天空。',
     reversed:'勉强维持或延迟崩溃。你在极力阻止不可避免的改变，但裂缝已经出现。' },
-  { id:17, name:'星星', en:'The Star', roman:'XVII', icon:'⭐', keywords:'希望·疗愈·灵感', keywordsR:'失望·怀疑·迷失',
+  { id:17, name:'星星', en:'The Star', roman:'XVII', keywords:'希望·疗愈·灵感', keywordsR:'失望·怀疑·迷失',
     upright:'黑暗中闪耀的星光。疗愈已经开始，希望重燃。相信自己，宇宙正在为你指引方向。',
     reversed:'希望破灭或自我怀疑。你暂时看不到光，但它从未消失。请继续相信。' },
-  { id:18, name:'月亮', en:'The Moon', roman:'XVIII', icon:'🌑', keywords:'幻象·恐惧·潜意识', keywordsR:'消退·明朗·真相',
+  { id:18, name:'月亮', en:'The Moon', roman:'XVIII', keywords:'幻象·恐惧·潜意识', keywordsR:'消退·明朗·真相',
     upright:'在月光下，一切都不似表面所见。直面内心的恐惧与幻象，穿过迷雾，方能抵达真相。',
     reversed:'恐惧消退，迷雾散去。混乱即将结束，真相正从黑暗中浮现。' },
-  { id:19, name:'太阳', en:'The Sun', roman:'XIX', icon:'☀️', keywords:'喜悦·成功·活力', keywordsR:'阴霾·过度·自负',
+  { id:19, name:'太阳', en:'The Sun', roman:'XIX', keywords:'喜悦·成功·活力', keywordsR:'阴霾·过度·自负',
     upright:'阳光普照！这是充满喜悦、成功与活力的时刻。一切都清晰明朗，尽情享受这份温暖。',
     reversed:'短暂的阴霾或过分乐观。快乐被遮蔽，但太阳终会出来。保持信心。' },
-  { id:20, name:'审判', en:'Judgement', roman:'XX', icon:'📯', keywords:'觉醒·召唤·重生', keywordsR:'逃避·懊悔·停滞',
+  { id:20, name:'审判', en:'Judgement', roman:'XX', keywords:'觉醒·召唤·重生', keywordsR:'逃避·懊悔·停滞',
     upright:'觉醒的号角已经吹响。回应内心深处的召唤，拥抱全新的使命。这是灵魂重生的时刻。',
     reversed:'逃避召唤或自我审判。你拒绝听到内心的声音，或是沉溺于过去的懊悔之中。' },
-  { id:21, name:'世界', en:'The World', roman:'XXI', icon:'🌍', keywords:'圆满·完成·整合', keywordsR:'未竟·延迟·遗憾',
+  { id:21, name:'世界', en:'The World', roman:'XXI', keywords:'圆满·完成·整合', keywordsR:'未竟·延迟·遗憾',
     upright:'一个完整周期的终结。旅途圆满，收获满满。庆祝你的成就，准备迎接新的冒险。',
     reversed:'未完成或延迟的圆满。你还差最后一步，不要在此刻放弃。' }
 ];
@@ -258,6 +292,8 @@ let drawnCards = [];
 let flipCount = 0;
 
 function getCardCount() { return currentMode === 'single' ? 1 : 3; }
+
+function cardImagePath(id) { return 'images/' + id + '.jpg'; }
 
 // ═══════════════════════════════════════
 //  STARFIELD
@@ -363,17 +399,19 @@ function initSpread() {
     badge.className = 'card-badge ' + (card.isReversed ? 'reversed-badge' : 'upright');
     badge.textContent = card.isReversed ? '逆位' : '正位';
     
-    // Front
+    // Front - with actual tarot image
     const front = document.createElement('div');
     front.className = 'card-front';
     const meaning = card.isReversed ? card.reversed : card.upright;
     const kw = card.isReversed ? (card.keywordsR || card.keywords) : card.keywords;
     front.innerHTML = `
-      <div class="card-icon">${card.icon}</div>
-      <div class="card-name">${card.name}</div>
-      <div class="card-roman">${card.roman} · ${card.en}</div>
-      <div class="card-meaning">${meaning}</div>
-      <div class="card-keywords">${kw}</div>
+      <img class="card-img" src="${cardImagePath(card.id)}" alt="${card.name}" loading="lazy">
+      <div class="card-img-overlay">
+        <div class="card-name">${card.name}</div>
+        <div class="card-roman">${card.roman} · ${card.en}</div>
+        <div class="card-meaning">${meaning}</div>
+        <div class="card-keywords">${kw}</div>
+      </div>
     `;
     
     // Back
@@ -425,7 +463,7 @@ function showReading() {
     const pos = card.isReversed ? '逆位' : '正位';
     summary.innerHTML = `
       <div class="mini-card ${card.isReversed ? 'reversed-mini' : ''}">
-        <div class="mini-icon">${card.icon}</div>
+        <img class="mini-img ${card.isReversed ? 'reversed-img' : ''}" src="${cardImagePath(card.id)}" alt="${card.name}">
         <div class="mini-name">${card.name}</div>
         <div class="mini-pos">${card.roman} · ${card.en}</div>
         <div class="mini-badge ${card.isReversed ? 'reversed-badge' : 'upright-badge'}">${pos}</div>
@@ -437,13 +475,12 @@ function showReading() {
       `命运为你揭开了${card.name}牌（${pos}）。${meaning}`;
     
   } else {
-    const [past, present, future] = drawnCards;
     summary.innerHTML = drawnCards.map((c, i) => {
       const labels = ['过往', '当下', '未来'];
       const p = c.isReversed ? '逆位' : '正位';
       return `
         <div class="mini-card ${c.isReversed ? 'reversed-mini' : ''}">
-          <div class="mini-icon">${c.icon}</div>
+          <img class="mini-img ${c.isReversed ? 'reversed-img' : ''}" src="${cardImagePath(c.id)}" alt="${c.name}">
           <div class="mini-name">${c.name}</div>
           <div class="mini-pos">${labels[i]}</div>
           <div class="mini-badge ${c.isReversed ? 'reversed-badge' : 'upright-badge'}">${p}</div>
@@ -451,6 +488,7 @@ function showReading() {
       `;
     }).join('');
     
+    const [past, present, future] = drawnCards;
     const pm = past.isReversed ? '逆位' : '正位';
     const prm = present.isReversed ? '逆位' : '正位';
     const fm = future.isReversed ? '逆位' : '正位';
