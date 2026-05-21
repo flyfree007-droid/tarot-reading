@@ -79,17 +79,6 @@
     transition: transform 0.5s ease;
   }
 
-  .card-front .card-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 2rem 0.5rem 0.5rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, transparent 100%);
-    text-align: center;
-    transition: opacity 0.5s;
-  }
-
   .card-front .card-img-overlay {
     position: absolute;
     bottom: 0;
@@ -123,60 +112,13 @@
   .card-badge.upright { background: rgba(201,169,110,0.25); color: var(--gold-light); border: 1px solid rgba(201,169,110,0.4); }
   .card-badge.reversed-badge { background: rgba(196,72,138,0.25); color: var(--accent); border: 1px solid rgba(196,72,138,0.4); }
 
-  /* ── Card Back (Dark Mystic) ── */
+  /* ── Card Back ── */
   .card-back {
-    background: #0a0620;
-    border: 1.5px solid rgba(201,169,110,0.4);
-    box-shadow: 0 2px 20px rgba(139,105,20,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+    background: #0b0720 url('images/back.jpg?v=2') center/cover no-repeat;
+    border: 1.5px solid rgba(201,169,110,0.35);
+    box-shadow: 0 2px 20px rgba(139,105,20,0.12);
   }
-  /* Outer geometric border */
-  .card-back::before {
-    content: '';
-    position: absolute;
-    inset: 8px;
-    border: 1px solid rgba(201,169,110,0.12);
-    border-radius: 6px;
-    pointer-events: none;
-  }
-  /* Central diamond */
-  .card-back::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 42px; height: 42px;
-    transform: translate(-50%, -50%) rotate(45deg);
-    border: 1.5px solid rgba(201,169,110,0.5);
-    pointer-events: none;
-    box-shadow: 0 0 30px rgba(201,169,110,0.15), 0 0 60px rgba(201,169,110,0.06);
-    animation: diamondPulse 4s ease-in-out infinite;
-  }
-  @keyframes diamondPulse {
-    0%, 100% { border-color: rgba(201,169,110,0.5); box-shadow: 0 0 30px rgba(201,169,110,0.15), 0 0 60px rgba(201,169,110,0.06); }
-    50% { border-color: rgba(201,169,110,0.75); box-shadow: 0 0 40px rgba(201,169,110,0.25), 0 0 80px rgba(201,169,110,0.1); }
-  }
-  .card-back-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  /* Small inner dot */
-  .card-back-inner::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 6px; height: 6px;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: rgba(201,169,110,0.7);
-    box-shadow: 0 0 8px rgba(201,169,110,0.4);
-  }
+  .card-back .card-back-inner { display: none; }
 
   /* ── Reading Panel ── */
   .reading { max-width: 680px; width: 100%; text-align: center; opacity: 0; transform: translateY(20px); transition: all 0.8s ease 0.3s; pointer-events: none; }
@@ -220,7 +162,7 @@
     inset: 0;
     border-radius: 10px;
     border: 2px solid rgba(201,169,110,0.5);
-    background: radial-gradient(ellipse at 50% 45%, #1a1040 0%, #0c0820 50%, #060312 100%);
+    background: #0b0720 url('images/back.jpg?v=2') center/cover no-repeat;
     box-shadow: 0 4px 25px rgba(139,105,20,0.15);
     transition: all 0.4s ease;
   }
@@ -229,15 +171,6 @@
   .deck-pile .stack-card:nth-child(3) { transform: translate(3px, 0) rotate(1.5deg); }
   .deck-pile .stack-card:nth-child(4) { transform: translate(1.5px, 2px) rotate(0.8deg); }
   .deck-pile .stack-card:nth-child(5) { transform: translate(-1.5px, 3px) rotate(-0.8deg); }
-  .deck-pile .deck-eye {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    filter: drop-shadow(0 0 20px rgba(201,169,110,0.5));
-    z-index: 10;
-    animation: eyePulse 3s ease-in-out infinite;
-  }
   .deck-pile .deck-hint {
     position: absolute;
     bottom: -40px;
@@ -311,12 +244,16 @@
     position: absolute;
     inset: -6px;
     border-radius: 14px;
-    opacity: 0;
+    opacity: 0.18;
+    background: rgba(201,169,110,0.08);
+    box-shadow: 0 0 20px rgba(201,169,110,0.1), 0 0 40px rgba(139,105,20,0.06);
     transition: opacity 0.3s;
     pointer-events: none;
   }
-  .fan-card-wrap .card { cursor: pointer; }
-
+  .fan-card-wrap .card {
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(201,169,110,0.15), 0 4px 20px rgba(0,0,0,0.5);
+  }
   /* ── Reveal area ── */
   .reveal-area { display: none; gap: clamp(1rem, 3vw, 2.5rem); flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
   .reveal-area.active { display: flex; }
@@ -335,8 +272,7 @@
     .reading .mini-card { width: 65px; }
     .deck-area { min-height: 280px; }
     .deck-pile { width: 110px; height: 168px; }
-    .deck-pile .deck-eye { font-size: 2.2rem; }
-    .fan-container { gap: 0.3rem; padding: 1.5rem 0.3rem; }
+        .fan-container { gap: 0.3rem; padding: 1.5rem 0.3rem; }
   }
 </style>
 </head>
@@ -443,13 +379,6 @@ const MAJOR_ARCANA = [
     upright:'一个完整周期的终结。旅途圆满，收获满满。庆祝你的成就，准备迎接新的冒险。',
     reversed:'未完成或延迟的圆满。你还差最后一步，不要在此刻放弃。' }
 ];
-
-// ═══════════════════════════════════════
-//  (old globals merged into draw interaction section below)
-
-function getCardCount_OLD() { return currentMode === 'single' ? 1 : 3; }
-
-function cardImagePath(id) { return 'images/' + id + '.jpg'; }
 
 // ═══════════════════════════════════════
 //  STARFIELD
@@ -573,7 +502,6 @@ function showDeck() {
   deckArea.innerHTML = `
     <div class="deck-pile" id="deckPile" onclick="fanOut()">
       ${[1,2,3,4,5].map(() => '<div class="stack-card"></div>').join('')}
-      <div class="deck-eye">🧿</div>
       <div class="deck-hint">轻触牌堆 · 抽取命运</div>
     </div>
   `;
@@ -635,11 +563,14 @@ function fanOut() {
       // Card (back-only, smaller)
       const cardEl = document.createElement('div');
       cardEl.className = 'card';
-      cardEl.style.width = Math.round(cardW * 0.72) + 'px';
-      cardEl.style.height = Math.round(cardH * 0.72) + 'px';
-      
+      cardEl.style.width = Math.round(cardW * 0.82) + 'px';
+      cardEl.style.height = Math.round(cardH * 0.82) + 'px';
+      cardEl.style.transformStyle = 'flat';
+      cardEl.style.backfaceVisibility = 'visible';
+
       const back = document.createElement('div');
       back.className = 'card-back';
+      back.style.backfaceVisibility = 'visible';
       back.innerHTML = createCardBackHTML();
       cardEl.appendChild(back);
       wrap.appendChild(cardEl);
@@ -661,6 +592,11 @@ function selectFanCard(fanIndex, wrapEl) {
   const count = getCardCount();
   
   if (selectedIndices.includes(fanIndex)) {
+    // Clicking an already selected card when selection is complete → reveal
+    if (selectedIndices.length >= count) {
+      revealSelected();
+      return;
+    }
     // Deselect
     selectedIndices = selectedIndices.filter(i => i !== fanIndex);
     wrapEl.classList.remove('selected');
@@ -813,9 +749,9 @@ function showReading() {
     const futureTxt = future.isReversed ? future.reversed : future.upright;
     
     document.getElementById('readingText').textContent =
-      `你的${past.name}牌（${pm}）揭示了过往的印记：${pastTxt.slice(0, 35)}。` +
-      `而今，${present.name}牌（${prm}）正指引着你当下的道路——${presentTxt.slice(0, 35)}。` +
-      `展望未来，${future.name}牌（${fm}）预示：${futureTxt.slice(0, 35)}` +
+      `你的${past.name}牌（${pm}）揭示了过往的印记：${pastTxt}` +
+      `而今，${present.name}牌（${prm}）正指引着你当下的道路——${presentTxt}` +
+      `展望未来，${future.name}牌（${fm}）预示：${futureTxt}` +
       `命运的织线已为你铺就，${past.name}、${present.name}与${future.name}——这三张牌共同描绘了你此刻的灵魂图景。`;
   }
   
