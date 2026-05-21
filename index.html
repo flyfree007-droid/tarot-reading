@@ -122,15 +122,9 @@
   .card-badge.upright { background: rgba(201,169,110,0.25); color: var(--gold-light); border: 1px solid rgba(201,169,110,0.4); }
   .card-badge.reversed-badge { background: rgba(196,72,138,0.25); color: var(--accent); border: 1px solid rgba(196,72,138,0.4); }
 
-  /* ── Card Back ── */
-  .card-back { background: linear-gradient(135deg, #1c0f35 0%, #150a28 50%, #1a0d30 100%); border: 2px solid var(--gold); box-shadow: 0 4px 30px rgba(139,105,20,0.2); }
-  .card-back-inner { width: 82%; height: 88%; border: 1px solid rgba(201,169,110,0.4); border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(201,169,110,0.04) 8px, rgba(201,169,110,0.04) 9px); }
-  .card-back-eye { font-size: 2.6rem; filter: drop-shadow(0 0 12px rgba(196,72,138,0.5)); margin-bottom: 0.3rem; }
-  .card-back-stars { font-size: 0.8rem; letter-spacing: 0.3em; color: var(--gold); opacity: 0.6; }
-  .card-back-border { position: absolute; inset: 4px; border: 1px solid rgba(201,169,110,0.15); border-radius: 3px; pointer-events: none; }
-  .card-back-corner { position: absolute; font-size: 0.7rem; color: var(--gold); opacity: 0.5; }
-  .card-back-corner.tl { top: 6px; left: 8px; } .card-back-corner.tr { top: 6px; right: 8px; }
-  .card-back-corner.bl { bottom: 6px; left: 8px; transform: rotate(180deg); } .card-back-corner.br { bottom: 6px; right: 8px; transform: rotate(180deg); }
+  /* ── Card Back (Roses & Lilies) ── */
+  .card-back { border: 2px solid var(--gold); box-shadow: 0 4px 30px rgba(139,105,20,0.2); }
+  .card-back .card-back-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px; }
 
   /* ── Reading Panel ── */
   .reading { max-width: 680px; width: 100%; text-align: center; opacity: 0; transform: translateY(20px); transition: all 0.8s ease 0.3s; pointer-events: none; }
@@ -169,7 +163,7 @@
     .card-front .card-overlay { padding: 1.5rem 0.3rem 0.3rem; }
     .card-front .card-name { font-size: 0.58rem; }
     .card-front .card-meaning { font-size: 0.48rem; }
-    .card-back-eye { font-size: 1.8rem; } .card-back-stars { font-size: 0.6rem; }
+
     .reading .reading-text { padding: 1rem 1.2rem; font-size: 0.9rem; }
     .mode-btn { padding: 0.5rem 1rem; font-size: 0.65rem; }
     .card-badge { font-size: 0.48rem; top: 4px; right: 4px; }
@@ -414,18 +408,10 @@ function initSpread() {
       </div>
     `;
     
-    // Back
+    // Back - Roses & Lilies vintage design
     const back = document.createElement('div');
     back.className = 'card-back';
-    back.innerHTML = `
-      <div class="card-back-inner">
-        <div class="card-back-border"></div>
-        <div class="card-back-corner tl">✧</div><div class="card-back-corner tr">✧</div>
-        <div class="card-back-corner bl">✧</div><div class="card-back-corner br">✧</div>
-        <div class="card-back-eye">🧿</div>
-        <div class="card-back-stars">✧ ✦ ✧</div>
-      </div>
-    `;
+    back.innerHTML = `<img class="card-back-img" src="images/back.jpg" alt="Card Back" loading="lazy">`;
     
     cardEl.appendChild(front);
     cardEl.appendChild(back);
